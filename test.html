@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>
+
+      async function init() {
+          const { instance } = await WebAssembly.instantiateStreaming(
+              fetch("./bare_metal_wasm.wasm")
+          );
+
+          const element = document.getElementById("demo-canvas")
+          const ctx = element.getContext("2d")
+          const canvas = ctx.canvas;
+
+          element.width = instance.exports.getWidth();
+          element.height = instance.exports.getHeight();
+
+          const buffer_address = instance.exports.BUFFER.value;
+          const image = new ImageData(
+              new Uint8ClampedArray(
+                  instance.exports.memory.buffer,
+                  buffer_address,
+                  4 * element.width * element.height,
+              ),
+              element.width,
+          );
+
+          instance.exports.init();
+
+          ctx.putImageData(image, 0, 0);
+
+          element.onclick = (event) => {
+              var x = event.clientX - canvas.offsetLeft
+              var y = event.clientY - canvas.offsetTop
+              instance.exports.plot(x,y,0);
+              ctx.putImageData(image, 0, 0);
+          };
+      }
+
+      init();
+      </script>
+  </head>
+  <body>
+    <canvas id="demo-canvas"></canvas>
+  </body>
+</html>
