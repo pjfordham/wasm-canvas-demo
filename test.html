@@ -3,11 +3,13 @@
   <head>
     <script>
 
-      async function init() {
-          const { instance } = await WebAssembly.instantiateStreaming(
-              fetch("./bare_metal_wasm.wasm")
-          );
+//    async function init() {
+//        const { instance } = await WebAssembly.instantiateStreaming(
+//            fetch("./bare_metal_wasm.wasm")
+//        );
 
+      WebAssembly.instantiateStreaming( fetch("./bare_metal_wasm.wasm")).then(wasm => {
+          const instance = wasm.instance
           const element = document.getElementById("demo-canvas")
           const ctx = element.getContext("2d")
           const canvas = ctx.canvas;
@@ -35,9 +37,9 @@
               instance.exports.plot(x,y,0);
               ctx.putImageData(image, 0, 0);
           };
-      }
+      } )
 
-      init();
+      // init();
       </script>
   </head>
   <body>
