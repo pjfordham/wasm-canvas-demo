@@ -34,9 +34,15 @@
           element.onclick = (event) => {
               var x = event.clientX - canvas.offsetLeft
               var y = event.clientY - canvas.offsetTop
-              instance.exports.plot(x,y,0);
-              ctx.putImageData(image, 0, 0);
+              instance.exports.click(x,y);
           };
+
+          const interval = setInterval(function() {
+              instance.exports.pulse();
+              ctx.putImageData(image, 0, 0);
+          }, 10);
+
+          // clearInterval(interval);
       } )
 
       // init();
@@ -44,5 +50,6 @@
   </head>
   <body>
     <canvas id="demo-canvas"></canvas>
-  </body>
+    <canvas id="demo-canvas2"></canvas>
+   </body>
 </html>

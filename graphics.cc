@@ -14,6 +14,23 @@ extern "C" void plot(int x, int y, int color) {
    BUFFER[WIDTH * y + x] = color;
 }
 
+int count = 0;
+extern "C" void click(int x, int y) {
+  count = 0;
+  }
+
+extern "C" void pulse() {
+    for (int x = 0; x < WIDTH; x++) {
+        for (int y = 0; y < HEIGHT; y++) {
+           // RGBA little endian
+           plot( x,y, (y < count) ? 0xff0000ff : 0xffff0000 );
+        }
+    }
+    count++;
+    if (count == HEIGHT) count = 0;
+
+}
+
 extern "C" void init() {
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
