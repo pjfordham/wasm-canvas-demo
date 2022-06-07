@@ -22,8 +22,8 @@ extern "C" void plot(int x, int y, int color) {
 }
 
 void plot_rectange(int x, int y, int color) {
-   for (int i = 0; i < TILE_SIZE; ++i) {
-      for (int j = 0; j < TILE_SIZE; ++j) {
+   for (int i = 0; i < TILE_SIZE-1; ++i) {
+      for (int j = 0; j < TILE_SIZE-1; ++j) {
          plot( x * TILE_SIZE + i,
                y * TILE_SIZE + j,
                color );
@@ -43,6 +43,11 @@ public:
    const char *name;
 };
 
+constexpr int length(const char* str)
+{
+    return *str ? 1 + length(str + 1) : 0;
+}
+
 #define SubShape( NAME, ... )                             \
    struct NAME : public Shape {                           \
       NAME() {                                            \
@@ -51,7 +56,7 @@ public:
          name = Name;                                     \
          figure = shape;                                  \
          height = sizeof( shape ) / sizeof( *shape );     \
-         width = 0;                      \
+         width = length( shape[0] );                      \
       }                                                   \
    };
 
@@ -114,12 +119,12 @@ public:
    int getState( int state , int x , int y );
    void iterate(unsigned int iterations);
 private:
-   Array2D<int> world;
-   Array2D<int> otherWorld;
+   int world[HEIGHT][WIDTH];
+   int otherWorld[HEIGHT][WIDTH];
 
 };
 
-GameOfLife::GameOfLife() : world(HEIGHT,WIDTH), otherWorld(HEIGHT,WIDTH)  {
+GameOfLife::GameOfLife()  {
    clear();
 }
 
@@ -145,8 +150,7 @@ void GameOfLife::addShape( Shape shape, int x, int y )
    for ( int i = y; i - y < shape.height; i++ ) {
       for ( int j = x; j - x < shape.width; j++ ) {
          if ( i < HEIGHT && j < WIDTH ) {
-            world[i][j] =
-               shape.figure[ i - y ][j - x ] == 'X' ? LIVE : DEAD;
+            world[i][j] = shape.figure[ i - y ][j - x ] == 'X' ? LIVE : DEAD;
          }
       }
    }
@@ -232,44 +236,55 @@ Shape shapes[] = { Almond(), Glider(), Crab(), RPentomino(), SpaceShip(), Blinke
 int shapeIndex = 0;
 
 extern "C" void init() {
-     // // Clear window to Blue to do blue boarder.
-     //  window.clear( sf::Color::Blue );
-
-     //  // draw black background for theatre of life
-     //  sf::RectangleShape shape(sf::Vector2f(TILE_SIZE*BOARD_SIZE, TILE_SIZE*BOARD_SIZE));
-     //  shape.setPosition( TILE_SIZE, TILE_SIZE);
-     //  shape.setFillColor(sf::Color::Black);
-     //  window.draw(shape);
+   // Clear window to Blue to do blue boarder.
+   for( int x=0;x<BOARD_SIZE+2;x++ ){
+      for ( int y = 0;y<BOARD_SIZE+2;y++) {
+         plot_rectange(x, y, 0xFFFF0000);
+      }
+   }
 }
 
-extern "C" void pulse() {
-    plot_rectange(0, 0, 0xFF445566);
-    for( int x=0;x<BOARD_SIZE;x++ ){
+void draw() {
+   for( int x=0;x<BOARD_SIZE;x++ ){
       for ( int y = 0;y<BOARD_SIZE;y++) {
          auto content = gol.getContent(x, y);
          switch ( content ) {
          case GameOfLife::DEAD:
-           plot_rectange(x, y, 0xFF000000);
+            plot_rectange(x+1, y+1, 0xFF000000);
             break;
          case GameOfLife::LIVE:
          {
-           plot_rectange(x, y, 0xFFFF0000);
+            plot_rectange(x+1, y+1, 0xFF00FF00);
             break;
          }
          default:
          {
-           plot_rectange(x, y, 0xFFFF0000 * content);
+            // plot_rectange(x+1, y+1, 0xFF000000);
+            plot_rectange(x+1, y+1, 0xFF00FF * content);
             break;
          }
          }
       }
    }
+  
 }
 
-extern "C" void click(int x, int y) {
-  gol.iterate(1);
+extern "C" void pulse() {
+   gol.iterate(1);
+   draw();
+   }
 
-    gol.click( (y / (int)TILE_SIZE ) - 1,
-              (x / (int)TILE_SIZE ) - 1 );
+extern "C" void click(int x, int y) {
+
+   auto i = (y / TILE_SIZE) - 1;
+   auto j = (x / TILE_SIZE) - 1;
+
+   if ( 0 <= i && i < BOARD_SIZE &&
+        0 <= j && j < BOARD_SIZE )
+      // gol.click( i ,j);
+
+   gol.addShape( RPentomino(), i ,j );
+   draw();
+   
 }
 

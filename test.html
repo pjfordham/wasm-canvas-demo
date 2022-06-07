@@ -27,6 +27,7 @@
               element.width,
           );
 
+          instance.exports.__wasm_call_ctors();
           instance.exports.init();
 
           ctx.putImageData(image, 0, 0);
@@ -35,12 +36,13 @@
               var x = event.clientX - canvas.offsetLeft
               var y = event.clientY - canvas.offsetTop
               instance.exports.click(x,y);
+              ctx.putImageData(image, 0, 0);
           };
 
           const interval = setInterval(function() {
               instance.exports.pulse();
               ctx.putImageData(image, 0, 0);
-          }, 10);
+          }, 100);
 
           // clearInterval(interval);
       } )
