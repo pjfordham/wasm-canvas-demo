@@ -39,6 +39,12 @@
               ctx.putImageData(image, 0, 0);
           };
 
+          // Canvas won't receive keypress events so grab the ones for the whole window
+          window.onkeypress = (event) => {
+              instance.exports.keypress(event.key.charCodeAt(0));
+              ctx.putImageData(image, 0, 0);
+          };
+
           const interval = setInterval(function() {
               instance.exports.pulse();
               ctx.putImageData(image, 0, 0);

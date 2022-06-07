@@ -1,4 +1,3 @@
-
 #include "support.hh"
 
 const int BOARD_SIZE = 100;
@@ -174,7 +173,7 @@ int GameOfLife::getContent(int i, int j) {
 }
 
 namespace std {
-   template<class T> 
+   template<class T>
 const T& max(const T& a, const T& b)
 {
     return (a < b) ? b : a;
@@ -249,7 +248,7 @@ public:
    unsigned char a,b,g,r;
    js_color(unsigned char _a, unsigned char _b, unsigned char _g, unsigned char _r) : a(_a), b(_b), g(_g), r(_r) {
    }
-   
+
    js_color operator* ( js_color color ) const {
       return js_color( (a * color.a) >> 8,
                        (b * color.b) >> 8,
@@ -260,7 +259,7 @@ public:
    operator unsigned int() const {
       return (a << 24) | (b << 16) | (g << 8) | r;
    }
-   
+
 };
 const js_color js_red(0xFF, 0x00, 0x00, 0xFF);
 const js_color js_green(0xFF, 0x00, 0xFF, 0x00);
@@ -290,7 +289,7 @@ void draw() {
          }
       }
    }
-  
+
 }
 
 extern "C" void pulse() {
@@ -309,6 +308,32 @@ extern "C" void click(int x, int y) {
 
    gol.addShape( RPentomino(), i ,j );
    draw();
-   
+
 }
 
+extern "C" void keypress(char key) {
+
+   switch( key ) {
+   case 'q':
+      gol.addShape( RPentomino(), 5 ,5 );
+      break;
+   case 'w':
+      gol.addShape( RPentomino(), 15 ,5 );
+      break;
+   case 'e':
+      gol.addShape( RPentomino(), 25 ,5 );
+      break;
+   case 'r':
+      gol.addShape( RPentomino(), 35 ,5 );
+      break;
+   case 't':
+      gol.addShape( RPentomino(), 45 ,5 );
+      break;
+   default:
+         gol.addShape( RPentomino(), 55 ,5 );
+   break;
+   }
+
+   draw();
+
+}
