@@ -17,13 +17,13 @@ extern "C" int getHeight() {
    return SCREEN_HEIGHT;
 }
 
-extern "C" void plot(int x, int y, int color) {
+extern "C" void plot(int x, int y, unsigned int color) {
    BUFFER[SCREEN_WIDTH * y + x] = color;
 }
 
-void plot_rectange(int x, int y, int color) {
-   for (int i = 0; i < TILE_SIZE-1; ++i) {
-      for (int j = 0; j < TILE_SIZE-1; ++j) {
+void plot_rectange(int x, int y, unsigned int color) {
+   for (int i = 0; i < TILE_SIZE; ++i) {
+      for (int j = 0; j < TILE_SIZE; ++j) {
          plot( x * TILE_SIZE + i,
                y * TILE_SIZE + j,
                color );
@@ -244,23 +244,47 @@ extern "C" void init() {
    }
 }
 
+class js_color {
+public:
+   unsigned char a,b,g,r;
+   js_color(unsigned char _a, unsigned char _b, unsigned char _g, unsigned char _r) : a(_a), b(_b), g(_g), r(_r) {
+   }
+   
+   js_color operator* ( js_color color ) const {
+      return js_color( (a * color.a) >> 8,
+                       (b * color.b) >> 8,
+                       (g * color.g) >> 8,
+                       (r * color.r) >> 8 );
+   }
+
+   operator unsigned int() const {
+      return (a << 24) | (b << 16) | (g << 8) | r;
+   }
+   
+};
+const js_color js_red(0xFF, 0x00, 0x00, 0xFF);
+const js_color js_green(0xFF, 0x00, 0xFF, 0x00);
+const js_color js_blue(0xFF, 0xFF, 0x00, 0x00);
+const js_color js_black(0xFF, 0x00, 0x00, 0x00);
+const js_color js_white(0xFF, 0xFF, 0xff, 0xFF);
+
+
 void draw() {
    for( int x=0;x<BOARD_SIZE;x++ ){
       for ( int y = 0;y<BOARD_SIZE;y++) {
          auto content = gol.getContent(x, y);
          switch ( content ) {
          case GameOfLife::DEAD:
-            plot_rectange(x+1, y+1, 0xFF000000);
+            plot_rectange(x+1, y+1,js_black);
             break;
          case GameOfLife::LIVE:
          {
-            plot_rectange(x+1, y+1, 0xFF00FF00);
+            plot_rectange(x+1, y+1,js_green);
             break;
          }
          default:
          {
-            // plot_rectange(x+1, y+1, 0xFF000000);
-            plot_rectange(x+1, y+1, 0xFF00FF * content);
+            plot_rectange(x+1, y+1, js_green * js_color(0xFF, content, content, content));
             break;
          }
          }
