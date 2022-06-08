@@ -6,7 +6,7 @@
 template<typename type>
 class Array2D {
    int y;
-   type bigarray[1024];
+   type bigarray[20000];
    type *data;
 public:
    // We can't do a copy since we don't know

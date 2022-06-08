@@ -118,12 +118,12 @@ public:
    int getState( int state , int x , int y );
    void iterate(unsigned int iterations);
 private:
-   int world[HEIGHT][WIDTH];
-   int otherWorld[HEIGHT][WIDTH];
+   Array2D<int> world;
+   Array2D<int> otherWorld;
 
 };
 
-GameOfLife::GameOfLife()  {
+GameOfLife::GameOfLife()  : world(HEIGHT,WIDTH), otherWorld(HEIGHT,WIDTH) {
    clear();
 }
 
@@ -231,17 +231,10 @@ void GameOfLife::iterate( unsigned int iterations ) {
 
 GameOfLife gol;
 
+bool running = false;
+
 Shape shapes[] = { Almond(), Glider(), Crab(), RPentomino(), SpaceShip(), Blinker() };
 int shapeIndex = 0;
-
-extern "C" void init() {
-   // Clear window to Blue to do blue boarder.
-   for( int x=0;x<BOARD_SIZE+2;x++ ){
-      for ( int y = 0;y<BOARD_SIZE+2;y++) {
-         plot_rectange(x, y, 0xFFFF0000);
-      }
-   }
-}
 
 class js_color {
 public:
@@ -292,10 +285,22 @@ void draw() {
 
 }
 
-extern "C" void pulse() {
-   gol.iterate(1);
-   draw();
+extern "C" void init() {
+   // Clear window to Blue to do blue boarder.
+   for( int x=0;x<BOARD_SIZE+2;x++ ){
+      for ( int y = 0;y<BOARD_SIZE+2;y++) {
+         plot_rectange(x, y, 0xFFFF0000);
+      }
    }
+   draw();
+}
+
+extern "C" void pulse() {
+   if (running) {
+      gol.iterate(1);
+      draw();
+   }
+}
 
 extern "C" void click(int x, int y) {
 
@@ -304,36 +309,29 @@ extern "C" void click(int x, int y) {
 
    if ( 0 <= i && i < BOARD_SIZE &&
         0 <= j && j < BOARD_SIZE )
-      // gol.click( i ,j);
-
-   gol.addShape( RPentomino(), i ,j );
-   draw();
+   {
+      gol.addShape( RPentomino(), i ,j );
+      draw();
+   }
 
 }
 
 extern "C" void keypress(char key) {
-
    switch( key ) {
-   case 'q':
-      gol.addShape( RPentomino(), 5 ,5 );
+   case 'i':
+      gol.iterate(1);
       break;
-   case 'w':
-      gol.addShape( RPentomino(), 15 ,5 );
+   case 'c':
+      gol.clear();
       break;
-   case 'e':
-      gol.addShape( RPentomino(), 25 ,5 );
-      break;
-   case 'r':
-      gol.addShape( RPentomino(), 35 ,5 );
-      break;
-   case 't':
-      gol.addShape( RPentomino(), 45 ,5 );
-      break;
+   case ' ':
    default:
-         gol.addShape( RPentomino(), 55 ,5 );
-   break;
+      running = !running;
+      break;
    }
 
    draw();
 
 }
+
+extern "C" void atexit() {}
