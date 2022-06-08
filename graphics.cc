@@ -310,6 +310,20 @@ extern "C" void click(int x, int y) {
    if ( 0 <= i && i < BOARD_SIZE &&
         0 <= j && j < BOARD_SIZE )
    {
+      gol.click( i ,j );
+      draw();
+   }
+
+}
+
+extern "C" void rightclick(int x, int y) {
+
+   auto i = (y / TILE_SIZE) - 1;
+   auto j = (x / TILE_SIZE) - 1;
+
+   if ( 0 <= i && i < BOARD_SIZE &&
+        0 <= j && j < BOARD_SIZE )
+   {
       gol.addShape( RPentomino(), i ,j );
       draw();
    }

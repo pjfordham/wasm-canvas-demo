@@ -32,11 +32,16 @@
 
           ctx.putImageData(image, 0, 0);
 
-          element.onclick = (event) => {
+          element.onmousedown = (event) => {
               var x = event.clientX - canvas.offsetLeft
               var y = event.clientY - canvas.offsetTop
-              instance.exports.click(x,y);
-              ctx.putImageData(image, 0, 0);
+              if (event.button == 0) {
+                  instance.exports.click(x,y);
+                  ctx.putImageData(image, 0, 0);
+              } else if (event.button == 2) {
+                  instance.exports.rightclick(x,y);
+                  ctx.putImageData(image, 0, 0);
+              }
           };
 
           // Canvas won't receive keypress events so grab the ones for the whole window
@@ -57,7 +62,6 @@
       </script>
   </head>
   <body>
-    <canvas id="demo-canvas"></canvas>
-    <canvas id="demo-canvas2"></canvas>
+    <canvas id="demo-canvas" oncontextmenu="return false;"></canvas>
    </body>
 </html>
