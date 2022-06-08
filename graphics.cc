@@ -324,7 +324,7 @@ extern "C" void rightclick(int x, int y) {
    if ( 0 <= i && i < BOARD_SIZE &&
         0 <= j && j < BOARD_SIZE )
    {
-      gol.addShape( RPentomino(), i ,j );
+      gol.addShape( shapes[ shapeIndex ], i ,j );
       draw();
    }
 
@@ -337,6 +337,24 @@ extern "C" void keypress(char key) {
       break;
    case 'c':
       gol.clear();
+      break;
+   case '1':
+      shapeIndex = 0;
+      break;
+   case '2':
+      shapeIndex = 1;
+      break;
+   case '3':
+      shapeIndex = 2;
+      break;
+   case '4':
+      shapeIndex = 3;
+      break;
+   case '5':
+      shapeIndex = 4;
+      break;
+   case '6':
+      shapeIndex = 5;
       break;
    case ' ':
    default:
