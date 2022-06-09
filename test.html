@@ -8,8 +8,21 @@
 //            fetch("./bare_metal_wasm.wasm")
 //        );
 
+      function uint8_to_string(array) {
+          var string = "";
+          for (const x of array) {
+              if (x == 0) {
+                  break;
+              }
+              string = string.concat( String.fromCharCode(x) );
+          }
+          return string;
+      }
+
       WebAssembly.instantiateStreaming( fetch("./bare_metal_wasm.wasm")).then(wasm => {
+
           const instance = wasm.instance
+
           const element = document.getElementById("demo-canvas")
           const ctx = element.getContext("2d")
           const canvas = ctx.canvas;
@@ -18,6 +31,7 @@
           element.height = instance.exports.getHeight();
 
           const buffer_address = instance.exports.BUFFER.value;
+
           const image = new ImageData(
               new Uint8ClampedArray(
                   instance.exports.memory.buffer,
@@ -27,10 +41,18 @@
               element.width,
           );
 
+          const label = document.getElementById("demo-label")
+
+          const string_data = new Uint8ClampedArray(
+              instance.exports.memory.buffer,
+              instance.exports.STRINGS.value,
+              instance.exports.strings_size());
+
           instance.exports.__wasm_call_ctors();
           instance.exports.init();
 
           ctx.putImageData(image, 0, 0);
+          label.textContent = uint8_to_string( string_data );
 
           element.onmousedown = (event) => {
               var x = event.clientX - canvas.offsetLeft
@@ -38,9 +60,11 @@
               if (event.button == 0) {
                   instance.exports.click(x,y);
                   ctx.putImageData(image, 0, 0);
+                  label.textContent = uint8_to_string( string_data );
               } else if (event.button == 2) {
                   instance.exports.rightclick(x,y);
                   ctx.putImageData(image, 0, 0);
+                  label.textContent = uint8_to_string( string_data );
               }
           };
 
@@ -48,11 +72,13 @@
           window.onkeypress = (event) => {
               instance.exports.keypress(event.key.charCodeAt(0));
               ctx.putImageData(image, 0, 0);
+              label.textContent = uint8_to_string( string_data );
           };
 
           const interval = setInterval(function() {
               instance.exports.pulse();
               ctx.putImageData(image, 0, 0);
+              label.textContent = uint8_to_string( string_data );
           }, 10);
 
           // clearInterval(interval);
@@ -63,5 +89,7 @@
   </head>
   <body>
     <canvas id="demo-canvas" oncontextmenu="return false;"></canvas>
-   </body>
+    <p>
+    <label id="demo-label">Hello</label>
+  </body>
 </html>

@@ -8,6 +8,12 @@ const unsigned int SCREEN_HEIGHT = (2+BOARD_SIZE) * TILE_SIZE;
 
 unsigned int BUFFER[SCREEN_WIDTH * SCREEN_HEIGHT];
 
+char STRINGS[2048] = "Conways game of Life!";
+
+extern "C" int strings_size() {
+   return 2048;
+}
+
 extern "C" int getWidth() {
    return SCREEN_WIDTH;
 }
@@ -361,6 +367,16 @@ extern "C" void keypress(char key) {
       running = !running;
       break;
    }
+
+   int i =0;
+
+   const char *name = shapes[ shapeIndex ].name;
+   
+   while( name[i] != 0 ) {
+      STRINGS[i] = name[i];
+      ++i;
+   }
+   STRINGS[i] = 0;
 
    draw();
 
