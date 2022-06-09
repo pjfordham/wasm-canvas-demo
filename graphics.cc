@@ -240,7 +240,7 @@ GameOfLife gol;
 bool running = false;
 
 Shape shapes[] = { Almond(), Glider(), Crab(), RPentomino(), SpaceShip(), Blinker() };
-int shapeIndex = 0;
+unsigned int shapeIndex = 0;
 
 class js_color {
 public:
@@ -336,6 +336,18 @@ extern "C" void rightclick(int x, int y) {
 
 }
 
+
+char* strcpy(char* destination, const char* source)
+{
+    char *ptr = destination;
+    while (*source != '\0')
+    {
+        *destination++ = *source++;
+    }
+    *destination = '\0';
+    return ptr;
+}
+
 extern "C" void keypress(char key) {
    switch( key ) {
    case 'i':
@@ -344,40 +356,19 @@ extern "C" void keypress(char key) {
    case 'c':
       gol.clear();
       break;
-   case '1':
-      shapeIndex = 0;
+   case '+':
+      shapeIndex++;
       break;
-   case '2':
-      shapeIndex = 1;
+   case '-':
+      shapeIndex--;
       break;
-   case '3':
-      shapeIndex = 2;
-      break;
-   case '4':
-      shapeIndex = 3;
-      break;
-   case '5':
-      shapeIndex = 4;
-      break;
-   case '6':
-      shapeIndex = 5;
-      break;
-   case ' ':
    default:
       running = !running;
       break;
    }
 
-   int i =0;
-
-   const char *name = shapes[ shapeIndex ].name;
-   
-   while( name[i] != 0 ) {
-      STRINGS[i] = name[i];
-      ++i;
-   }
-   STRINGS[i] = 0;
-
+   shapeIndex = shapeIndex % 6;
+   strcpy( STRINGS, shapes[ shapeIndex ].name );
    draw();
 
 }
