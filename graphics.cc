@@ -42,10 +42,12 @@ const int WIDTH=BOARD_SIZE;
 
 struct Shape {
 public:
-   int height;
-   int width;
    const char * const* figure;
    const char *name;
+   int height;
+   int width;
+   constexpr Shape(const char *const * _figure, const char *_name, int _height, int _width ) :
+      figure(_figure), name(_name), height(_height), width(_width) {}
 };
 
 constexpr int length(const char* str)
@@ -53,16 +55,15 @@ constexpr int length(const char* str)
     return *str ? 1 + length(str + 1) : 0;
 }
 
-#define SubShape( NAME, ... )                             \
-   struct NAME : public Shape {                           \
-      NAME() {                                            \
-         static const char *shape[] = { __VA_ARGS__ };    \
-         static const char *Name = #NAME;                 \
-         name = Name;                                     \
-         figure = shape;                                  \
-         height = sizeof( shape ) / sizeof( *shape );     \
-         width = length( shape[0] );                      \
-      }                                                   \
+#define SubShape( NAME, ... )                                           \
+   struct NAME : public Shape {                                         \
+      static constexpr const char *shape[] = { __VA_ARGS__ };           \
+      static constexpr const char *Name = #NAME;                        \
+      constexpr NAME() :                                                \
+         Shape( shape, Name,                                            \
+                sizeof( shape ) / sizeof( *shape ),                     \
+                length( shape[0] ) ) {                                  \
+      }                                                                 \
    };
 
 SubShape( Crab,                                 \
