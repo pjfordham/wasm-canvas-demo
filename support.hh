@@ -1,6 +1,41 @@
 #ifndef SUPPORT_FILE_H
 #define SUPPORT_FILE_H
 
+unsigned char bigarray[1024 * 1024];
+int offset = 0;
+
+extern "C" void *memset(void *s, int c,  decltype(sizeof(0)) len)
+{
+   auto p=(unsigned char*)s;
+   while(len--)
+   {
+      *p++ = (unsigned char)c;
+   }
+   return s;
+}
+
+void *operator new(decltype(sizeof(0)) n) noexcept(false)
+{
+   void *ptr = &bigarray[offset];
+   offset+= n;
+   return ptr;
+}
+
+void operator delete(void * p) throw()
+{
+}
+
+void *operator new[](decltype(sizeof(0)) n) noexcept(false)
+{
+   void *ptr = &bigarray[offset];
+   offset+= n;
+   return ptr;
+}
+
+void operator delete[](void *p) throw()
+                       {
+                       }
+
 class js_color {
 public:
    unsigned char a,b,g,r;
@@ -91,7 +126,6 @@ inline char* strcpy(char* destination, const char* source)
 template<typename type>
 class Array2D {
    int y;
-   type bigarray[20000];
    type *data;
 public:
    // We can't do a copy since we don't know
@@ -113,7 +147,7 @@ public:
    // have some get x,y pos maybe too to optimize other stuff
 
    Array2D( int _x, int _y ) : y(_y) {
-      data = &bigarray[0];
+      data = new type[_x*y];
    }
 
    type const *operator[](int i) const {
