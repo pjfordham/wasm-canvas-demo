@@ -179,15 +179,6 @@ int GameOfLife::getContent(int i, int j) {
    return world[i][j];
 }
 
-namespace std {
-   template<class T>
-const T& max(const T& a, const T& b)
-{
-    return (a < b) ? b : a;
-}
-
-} // namespace std
-
 void GameOfLife::update() {
    for ( int i = 0; i < HEIGHT; i++ ) {
       for ( int j = 0; j < WIDTH; j++ ) {
@@ -195,14 +186,7 @@ void GameOfLife::update() {
             GameOfLife::getState(world[i][j] , i , j);
       }
    }
-   for ( int i = 0; i < HEIGHT; i++ ) {
-      for ( int j = 0; j < WIDTH; j++ ) {
-         world[i][j] = otherWorld[i][j];
-      }
-   }
-   // auto temp = world;
-   // world = otherWorld;
-   // otherWorld = temp;
+   std::swap(world, otherWorld);
 }
 
 int GameOfLife::getState( int state, int y, int x ) {
@@ -242,31 +226,6 @@ bool running = false;
 
 Shape shapes[] = { Almond(), Glider(), Crab(), RPentomino(), SpaceShip(), Blinker() };
 unsigned int shapeIndex = 0;
-
-class js_color {
-public:
-   unsigned char a,b,g,r;
-   js_color(unsigned char _a, unsigned char _b, unsigned char _g, unsigned char _r) : a(_a), b(_b), g(_g), r(_r) {
-   }
-
-   js_color operator* ( js_color color ) const {
-      return js_color( (a * color.a) >> 8,
-                       (b * color.b) >> 8,
-                       (g * color.g) >> 8,
-                       (r * color.r) >> 8 );
-   }
-
-   operator unsigned int() const {
-      return (a << 24) | (b << 16) | (g << 8) | r;
-   }
-
-};
-const js_color js_red(0xFF, 0x00, 0x00, 0xFF);
-const js_color js_green(0xFF, 0x00, 0xFF, 0x00);
-const js_color js_blue(0xFF, 0xFF, 0x00, 0x00);
-const js_color js_black(0xFF, 0x00, 0x00, 0x00);
-const js_color js_white(0xFF, 0xFF, 0xff, 0xFF);
-
 
 void draw() {
    for( int x=0;x<BOARD_SIZE;x++ ){
@@ -337,17 +296,6 @@ extern "C" void rightclick(int x, int y) {
 
 }
 
-
-char* strcpy(char* destination, const char* source)
-{
-    char *ptr = destination;
-    while (*source != '\0')
-    {
-        *destination++ = *source++;
-    }
-    *destination = '\0';
-    return ptr;
-}
 
 extern "C" void keypress(char key) {
    switch( key ) {
