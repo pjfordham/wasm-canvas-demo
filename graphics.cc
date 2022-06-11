@@ -108,6 +108,22 @@ SubShape(SpaceShip,                             \
          "X....X",                              \
          ".XXXXX" )
 
+SubShape(GliderGun,					\
+	 "........................X...........",	\
+	 "......................X.X...........",	\
+	 "............XX......XX............XX",	\
+	 "...........X...X....XX............XX",	\
+	 "XX........X.....X...XX..............",	\
+	 "XX........X...X.XX....X.X...........",	\
+	 "..........X.....X.......X...........",	\
+	 "...........X...X....................",	\
+	 "............XX......................" )
+
+SubShape(Pentadecathlon,			\
+	 "..X....X..",				\
+	 "XX.XXXX.XX",				\
+	 "..X....X.." )
+
 class GameOfLife {
 public:
 
@@ -224,7 +240,7 @@ GameOfLife gol;
 
 bool running = false;
 
-Shape shapes[] = { Almond(), Glider(), Crab(), RPentomino(), SpaceShip(), Blinker() };
+Shape shapes[] = { Almond(), Glider(), Crab(), RPentomino(), SpaceShip(), Blinker(), GliderGun(), Pentadecathlon() };
 unsigned int shapeIndex = 0;
 
 void draw() {
@@ -316,7 +332,7 @@ extern "C" void keypress(char key) {
       break;
    }
 
-   shapeIndex = shapeIndex % 6;
+   shapeIndex = shapeIndex % 8;
    strcpy( STRINGS, shapes[ shapeIndex ].name );
    draw();
 
