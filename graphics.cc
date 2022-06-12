@@ -1,6 +1,8 @@
-#include "support.hh"
+#include "clib.hh"
+#include "cpplib.hh"
+#include "jslib.hh"
+#include "life.hh"
 
-const int BOARD_SIZE = 100;
 const int TILE_SIZE = 10;
 
 const unsigned int SCREEN_WIDTH  = (2+BOARD_SIZE) * TILE_SIZE;
@@ -26,7 +28,7 @@ extern "C" void plot(int x, int y, unsigned int color) {
    BUFFER[SCREEN_WIDTH * y + x] = color;
 }
 
-void plot_rectange(int x, int y, unsigned int color) {
+static void plot_rectange(int x, int y, unsigned int color) {
    for (int i = 0; i < TILE_SIZE; ++i) {
       for (int j = 0; j < TILE_SIZE; ++j) {
          plot( x * TILE_SIZE + i,
@@ -37,34 +39,7 @@ void plot_rectange(int x, int y, unsigned int color) {
 }
 
 
-const int HEIGHT=BOARD_SIZE;
-const int WIDTH=BOARD_SIZE;
 
-struct Shape {
-public:
-   const char * const* figure;
-   const char *name;
-   int height;
-   int width;
-   constexpr Shape(const char *const * _figure, const char *_name, int _height, int _width ) :
-      figure(_figure), name(_name), height(_height), width(_width) {}
-};
-
-constexpr int length(const char* str)
-{
-    return *str ? 1 + length(str + 1) : 0;
-}
-
-#define SubShape( NAME, ... )                                           \
-   struct NAME : public Shape {                                         \
-      static constexpr const char *shape[] = { __VA_ARGS__ };           \
-      static constexpr const char *Name = #NAME;                        \
-      constexpr NAME() :                                                \
-         Shape( shape, Name,                                            \
-                sizeof( shape ) / sizeof( *shape ),                     \
-                length( shape[0] ) ) {                                  \
-      }                                                                 \
-   };
 
 SubShape( Crab,                                 \
           "....X.....X....",                    \
@@ -124,114 +99,6 @@ SubShape(Pentadecathlon,			\
 	 "XX.XXXX.XX",				\
 	 "..X....X.." )
 
-class GameOfLife {
-public:
-
-   static const int LIVE = 100;
-   static const int DEAD = 0;
-
-   GameOfLife();
-   void addShape( Shape shape, int x = -1 , int y = -1);
-   void click( int i, int j );
-
-   void print();
-   void update();
-   void clear();
-   int getContent( int i, int j);
-   int getState( int state , int x , int y );
-   void iterate(unsigned int iterations);
-private:
-   Array2D<int> world;
-   Array2D<int> otherWorld;
-
-};
-
-GameOfLife::GameOfLife()  : world(HEIGHT,WIDTH), otherWorld(HEIGHT,WIDTH) {
-   clear();
-}
-
-void GameOfLife::clear() {
-   for ( int i = 0; i < HEIGHT; i++ ) {
-      for ( int j = 0; j < WIDTH; j++ ) {
-         world[i][j] = DEAD;
-      }
-   }
-}
-
-void GameOfLife::click( int j, int i )
-{
-   if ( world[i][j] == LIVE ){
-      world[i][j] = DEAD;
-   } else {
-      world[i][j] = LIVE;
-   }
-}
-
-void GameOfLife::addShape( Shape shape, int x, int y )
-{
-   for ( int i = y; i - y < shape.height; i++ ) {
-      for ( int j = x; j - x < shape.width; j++ ) {
-         if ( i < HEIGHT && j < WIDTH ) {
-            world[i][j] = shape.figure[ i - y ][j - x ] == 'X' ? LIVE : DEAD;
-         }
-      }
-   }
-}
-
-void GameOfLife::print() {
-   // for ( int i = 0; i < HEIGHT; i++ ) {
-   //    for ( int j = 0; j < WIDTH; j++ ) {
-   //       std::cout << world[i][j];
-   //    }
-   //    std::cout << std::endl;
-   // }
-   // for ( int i = 0; i < WIDTH; i++ ) {
-   //    std::cout << '=';
-   // }
-   // std::cout << std::endl;
-}
-
-int GameOfLife::getContent(int i, int j) {
-   return world[i][j];
-}
-
-void GameOfLife::update() {
-   for ( int i = 0; i < HEIGHT; i++ ) {
-      for ( int j = 0; j < WIDTH; j++ ) {
-         otherWorld[i][j] =
-            GameOfLife::getState(world[i][j] , i , j);
-      }
-   }
-   std::swap(world, otherWorld);
-}
-
-int GameOfLife::getState( int state, int y, int x ) {
-    int neighbors = 0;
-    for ( int i = y - 1; i <= y + 1; i++ ) {
-       for ( int j = x - 1; j <= x + 1; j++ ) {
-          if ( i == y && j == x ) {
-             continue;
-          }
-          if ( i > -1 && i < HEIGHT && j > -1 && j < WIDTH ) {
-             if ( world[i][j] == LIVE ) {
-                neighbors++;
-             }
-          }
-       }
-    }
-    if (state == LIVE) {
-       return ( neighbors > 1 && neighbors < 4 ) ? LIVE : std::max( 0, world[y][x]-1);
-    }
-    else {
-       return ( neighbors == 3 ) ? LIVE : std::max(0, world[y][x]-1);
-    }
-}
-
-void GameOfLife::iterate( unsigned int iterations ) {
-    for ( int i = 0; i < iterations; i++ ) {
-        update();
-    }
-}
 
 
 
@@ -243,7 +110,7 @@ bool running = false;
 Shape shapes[] = { Almond(), Glider(), Crab(), RPentomino(), SpaceShip(), Blinker(), GliderGun(), Pentadecathlon() };
 unsigned int shapeIndex = 0;
 
-void draw() {
+static void draw() {
    for( int x=0;x<BOARD_SIZE;x++ ){
       for ( int y = 0;y<BOARD_SIZE;y++) {
          auto content = gol.getContent(x, y);
