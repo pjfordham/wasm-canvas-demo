@@ -124,7 +124,13 @@
                   //label.textContent = uint8_to_string( string_data );
               };
 
-         console.log("postpostrun");
+              const interval = setInterval(function() {
+                  Module.ccall('pulse','',[],[]);
+                  ctx.putImageData(image, 0, 0);
+                  //label.textContent = uint8_to_string( string_data );
+              }, 10);
+
+              console.log("postpostrun");
 
           }],
         preRun: [],
