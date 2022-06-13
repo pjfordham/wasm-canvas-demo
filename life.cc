@@ -1,4 +1,5 @@
 #include "life.hh"
+#include <algorithm>
 
 GameOfLife::GameOfLife()  : world(HEIGHT,WIDTH), otherWorld(HEIGHT,WIDTH) {
    clear();
