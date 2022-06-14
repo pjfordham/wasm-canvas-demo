@@ -75,7 +75,6 @@
 
       var Module = {
           postRun: [function() {
-              console.log("prepostrun");
               const element = document.getElementById("canvas")
               const ctx = element.getContext("2d")
               const canvas = ctx.canvas;
@@ -87,16 +86,11 @@
                                            'number', // return type
                                            [], // argument types
                                            [] );
-              console.log(Module.HEAPU8.buffer);
-              console.log( Module.ccall('get_buffer_address','number',[],[]));
-              console.log( 4 * element.width * element.height);
-              console.log( element.width);
               array = new Uint8ClampedArray(
                       Module.HEAPU8.buffer,
                       Module.ccall('get_buffer_address','number',[],[]),
                       4 * element.width * element.height,
               );
-              console.log( array.length );
               const image = new ImageData(
                   array,
                   element.width,
@@ -107,30 +101,21 @@
                   var y = event.clientY - canvas.offsetTop
                   if (event.button == 0) {
                       Module.ccall('click','',['number','number'],[x,y]);
-                      console.log("left");
                       ctx.putImageData(image, 0, 0);
-                      //label.textContent = uint8_to_string( string_data );
                   } else if (event.button == 2) {
                       Module.ccall('rightclick','',['number','number'],[x,y]);
-                      console.log("right");
                        ctx.putImageData(image, 0, 0);
-                      //label.textContent = uint8_to_string( string_data );
                   }
               };
               window.onkeypress = (event) => {
                   Module.ccall('keypress','',['number'],[event.key.charCodeAt(0)]);
-                  console.log("key");
                   ctx.putImageData(image, 0, 0);
-                  //label.textContent = uint8_to_string( string_data );
               };
 
               const interval = setInterval(function() {
                   Module._pulse();//ccall('pulse','',[],[]);
                   ctx.putImageData(image, 0, 0);
-                  //label.textContent = uint8_to_string( string_data );
               }, 10);
-
-              console.log("postpostrun");
 
           }],
         preRun: [],
