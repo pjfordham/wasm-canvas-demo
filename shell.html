@@ -125,7 +125,7 @@
               };
 
               const interval = setInterval(function() {
-                  Module.ccall('pulse','',[],[]);
+                  Module._pulse();//ccall('pulse','',[],[]);
                   ctx.putImageData(image, 0, 0);
                   //label.textContent = uint8_to_string( string_data );
               }, 10);
