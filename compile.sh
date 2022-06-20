@@ -4,5 +4,4 @@ clang++  --target=wasm32 -std=c++17 -O3 -fno-use-cxa-atexit -nostdlib -Wl,--no-e
 
 emscripten:
 
-emcc life.cc -O3  -std=c++17 graphics.cc -o life.html --shell-file=shell.html  -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" -sEXPORTED_FUNCTIONS=_getWidth,_getHeight,_click,_rightclick,_keypress,_get_buffer_address,_pulse 
-
+emcc life.cc -O3  -std=c++17 graphics.cc -o life.html --shell-file=shell.html  -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" -sEXPORTED_FUNCTIONS=_getWidth,_getHeight,_click,_rightclick,_keypress,_get_buffer_address,_pulse,_init

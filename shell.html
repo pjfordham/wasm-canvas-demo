@@ -75,6 +75,7 @@
 
       var Module = {
           postRun: [function() {
+              Module._init();
               const element = document.getElementById("canvas")
               const ctx = element.getContext("2d")
               const canvas = ctx.canvas;

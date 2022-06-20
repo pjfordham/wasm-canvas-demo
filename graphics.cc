@@ -1,16 +1,18 @@
+#include "render_window.hh"
+
 #include "jslib.hh"
 #include "life.hh"
 #include <string.h>
 #include <stdio.h>
+
+RenderWindow *window;
 
 const int TILE_SIZE = 10;
 
 const unsigned int SCREEN_WIDTH  = (2+BOARD_SIZE) * TILE_SIZE;
 const unsigned int SCREEN_HEIGHT = (2+BOARD_SIZE) * TILE_SIZE;
 
-unsigned int BUFFER[SCREEN_WIDTH * SCREEN_HEIGHT];
-
-extern "C" unsigned int *get_buffer_address() { return &BUFFER[0]; }
+extern "C" unsigned int *get_buffer_address() { return window->get_buffer_address(); }
 
 extern "C" int strings_size() {
    return 2048;
@@ -24,19 +26,6 @@ extern "C" int getHeight() {
    return SCREEN_HEIGHT;
 }
 
-extern "C" void plot(int x, int y, unsigned int color) {
-   BUFFER[SCREEN_WIDTH * y + x] = color;
-}
-
-static void plot_rectange(int x, int y, unsigned int color) {
-   for (int i = 0; i < TILE_SIZE; ++i) {
-      for (int j = 0; j < TILE_SIZE; ++j) {
-         plot( x * TILE_SIZE + i,
-               y * TILE_SIZE + j,
-               color );
-      }
-   }
-}
 
 
 SubShape( Crab,                                 \
@@ -108,35 +97,29 @@ unsigned int shapeIndex = 0;
 static void draw() {
    for( int x=0;x<BOARD_SIZE;x++ ){
       for ( int y = 0;y<BOARD_SIZE;y++) {
+         RectangleShape shape(TILE_SIZE, TILE_SIZE);
+         shape.setPosition((x+1)*TILE_SIZE, (y+1)*TILE_SIZE);
          auto content = gol.getContent(x, y);
          switch ( content ) {
          case GameOfLife::DEAD:
-            plot_rectange(x+1, y+1,js_black);
+            shape.setFillColor( js_black );
             break;
          case GameOfLife::LIVE:
-         {
-            plot_rectange(x+1, y+1,js_green);
+            shape.setFillColor( js_green );
             break;
-         }
          default:
-         {
-            plot_rectange(x+1, y+1, js_green * js_color(0xFF, content, content, content));
+            shape.setFillColor( js_green * js_color(0xFF, content, content, content));
             break;
          }
-         }
+         window->draw(shape);
       }
    }
-
 }
 
 extern "C" void init() {
-   // Clear window to Blue to do blue boarder.
-   for( int x=0;x<BOARD_SIZE+2;x++ ){
-      for ( int y = 0;y<BOARD_SIZE+2;y++) {
-         plot_rectange(x, y, 0xFFFF0000);
-      }
-   }
-   draw();
+   window = new RenderWindow( (2 + BOARD_SIZE) * TILE_SIZE,
+                              (2 + BOARD_SIZE) * TILE_SIZE);
+   window->clear( js_blue );
 }
 
 extern "C" void pulse() {
